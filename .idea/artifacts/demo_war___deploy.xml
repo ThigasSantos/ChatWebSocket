@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" build-on-make="true" name="demo:war - deploy">
+    <output-path>//wsl$/Ubuntu/home/rafa/codes/Jakarta/wildfly-27.0.0.Final/standalone/deployments</output-path>
+    <root id="archive" name="demo-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="demo:war exploded" />
+    </root>
+  </artifact>
+</component>

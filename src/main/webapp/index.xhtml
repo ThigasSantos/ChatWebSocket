@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+    This program and the accompanying materials are made available under the
+    terms of the Eclipse Public License v. 2.0, which is available at
+    http://www.eclipse.org/legal/epl-2.0.
+    This Source Code may also be made available under the following Secondary
+    Licenses when the conditions for such availability set forth in the
+    Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
+    version 2 with the GNU Classpath Exception, which is available at
+    https://www.gnu.org/software/classpath/license.html.
+    SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+-->
+
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:head>
+    <title>Websocket</title>
+    <style>
+        #chat {
+            margin: 50px;
+            padding: 10px;
+            height: 600px;
+            overflow-y: auto;
+            border: 1px solid black;
+        }
+
+        .mensagem {
+            border: 2px solid #dedede;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .usuario {
+            color: blueviolet;
+            margin-left: 50px;
+        }
+
+        .usuario::after {
+            content: "]";
+        }
+        .usuario::before {
+            content: "[";
+        }
+
+        .tempo {
+            float: right;
+            color: #aaa;
+        }
+    </style>
+
+</h:head>
+<h:body>
+    <h:form id="form">
+        <div id="chat-info">
+            <div>Connection Status: <span id="opened">offline</span></div>
+            <h:inputText id="message-input" value="#{someBean.conteudo}"/>
+            <h:commandButton id="button" value="push" action="#{someBean.send()}">
+                <f:ajax execute="message-input" />
+            </h:commandButton>
+        </div>
+        <div id="chat">
+            <ui:repeat value="#{chatGlobal.mensagens}" var="m">
+                <div class="mensagem">
+                    <span class="usuario">#{m.usuario.username}</span>
+                    <span class="conteudo">#{m.conteudo}</span>
+                    <span class="tempo">#{m.tempo}</span>
+                </div>
+            </ui:repeat>
+        </div>
+    </h:form>
+
+    <script>
+        const chat = document.getElementById("chat");
+
+        function createSpan(className, content) {
+            const span = document.createElement('span');
+            span.classList.add(className);
+            span.textContent = content;
+            return span;
+        }
+
+        function createMessage(data) {
+            const msg = document.createElement('div');
+            const usuario = createSpan('usuario', data.usuario.username);
+            const conteudo = createSpan('conteudo', data.conteudo);
+            const tempo = createSpan('tempo', data.tempo);
+            msg.append(usuario, conteudo, tempo);
+            msg.classList.add('mensagem')
+            chat.append(msg)
+        }
+
+        function onmessageHandler(data) {
+            createMessage(data);
+        }
+
+        function onopenHandler() {
+            document.getElementById('opened').innerHTML='online';
+        }
+    </script>
+
+    <f:websocket channel="push"
+                 onopen="onopenHandler"
+                 onmessage="onmessageHandler"
+    />
+</h:body>
+</html>
