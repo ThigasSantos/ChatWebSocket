@@ -17,11 +17,6 @@ public class Mensagem implements Serializable {
         );
     }
 
-    @Override
-    public String toString() {
-        return usuario.toString() + "  |  " + conteudo + "   [" + tempo + ']';
-    }
-
     // <editor-fold  defaultstate="collapsed" desc="Getters/Setters" >
     public String getConteudo() {
         return conteudo;
@@ -48,4 +43,8 @@ public class Mensagem implements Serializable {
     }
 
     // </editor-fold>
+    @Override
+    public String toString() {
+        return usuario.toString() + "  |  " + conteudo + "   [" + tempo + ']';
+    }
 }

@@ -1,16 +1,4 @@
 <!DOCTYPE html>
-<!--
-    Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
-    This program and the accompanying materials are made available under the
-    terms of the Eclipse Public License v. 2.0, which is available at
-    http://www.eclipse.org/legal/epl-2.0.
-    This Source Code may also be made available under the following Secondary
-    Licenses when the conditions for such availability set forth in the
-    Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
-    version 2 with the GNU Classpath Exception, which is available at
-    https://www.gnu.org/software/classpath/license.html.
-    SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
--->
 
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml"
@@ -21,63 +9,207 @@
 <h:head>
     <title>Websocket</title>
     <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Open Sans", "Helvetica", "Arial", sans-serif;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #form-conectar {
+            display: flex;
+            margin: 30px 10px;
+        }
+
+        #form-conectar input {
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        #form-conectar input[type="text"] {
+            border-right: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        #form-conectar input[type="submit"] {
+            background-color: #0e72ed;
+            color: aliceblue;
+            border-radius: 0 5px 5px 0;
+        }
+
         #chat {
-            margin: 50px;
-            padding: 10px;
+            width: 800px;
+            position: relative;
             height: 600px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        #chat-info {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            padding: 10px;
+            overflow: hidden;
+            background-color: #36454F;
+            color: aliceblue;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #chat-mensagens {
+            border-radius: 0  0 10px 10px;
+            border: 2px solid #36454F;
+            border-top-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
             overflow-y: auto;
-            border: 1px solid black;
+            padding: 15px;
+            gap: 5px;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;  /* IE and Edge */
+        }
+
+        #chat-mensagens::-webkit-scrollbar {
+            display: none;
+        }
+
+        #chat-form {
+            margin-left: 2%;
+            width: 96%;
+            position: absolute;
+            bottom: 10px;
+        }
+
+        #chat-form {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr auto;
+        }
+
+        #chat-form * {
+            padding: 6px;
+        }
+
+        #chat-form input[type="text"]{
+            border-right: 0;
+            border-radius: 10px 0 0 10px;
+        }
+
+        #chat-form input[type="submit"]{
+            background-color: #0e72ed;
+            color: aliceblue;
+            border-radius: 0 10px 10px 0;
         }
 
         .mensagem {
-            border: 2px solid #dedede;
-            background-color: #f1f1f1;
+            background-color: #0e72ed;
             border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
+            display: grid;
+            color: white;
+            grid-template-columns: 1fr auto;
+            margin-right: 15%;
+            padding: 10px 10px 10px 15px;
+        }
+
+
+        #chat-mensagens .mensagem:last-of-type {
+            margin-bottom: 50px;
+        }
+
+
+        .mensagem.notme {
+            background: #36454F;
+            grid-template-columns: auto 1fr auto;
+            margin-left: 15%;
+            margin-right: 0;
         }
 
         .usuario {
-            color: blueviolet;
-            margin-left: 50px;
+            display: none;
+            margin: 0 5px;
+            color: #0e72ed;
+            font-weight: bold;
+        }
+
+        .mensagem.notme .usuario {
+            display: inline;
         }
 
         .usuario::after {
-            content: "]";
+            content: " ] ";
         }
+
         .usuario::before {
-            content: "[";
+            content: "[ ";
         }
 
         .tempo {
             float: right;
+            color: white;
+        }
+
+        .mensagem.notme .tempo {
             color: #aaa;
         }
-    </style>
 
+        .status-connected {
+            color: lawngreen;
+        }
+
+        .status-disconnected {
+            color: ghostwhite;
+        }
+
+        .status-error {
+            color: red;
+        }
+    </style>
 </h:head>
 <h:body>
-    <h:form id="form">
-        <div id="chat-info">
-            <div>Connection Status: <span id="opened">offline</span></div>
-            <h:inputText id="message-input" value="#{someBean.conteudo}"/>
-            <h:commandButton id="button" value="push" action="#{someBean.send()}">
-                <f:ajax execute="message-input" />
+    <main>
+        <h:form id="form-conectar">
+            <h:inputText id="username-input" value="#{clientSession.usuario.username}" disabled="#{clientSession.conectado}"/>
+            <h:commandButton
+                    value="#{clientSession.conectado ? 'desconectar' : 'conectar'}"
+                    action="#{clientSession.conectar()}">
+                <f:ajax execute="username-input" render="form-conectar chat-mensagens" />
             </h:commandButton>
-        </div>
+        </h:form>
+
         <div id="chat">
-            <ui:repeat value="#{chatGlobal.mensagens}" var="m">
-                <div class="mensagem">
-                    <span class="usuario">#{m.usuario.username}</span>
-                    <span class="conteudo">#{m.conteudo}</span>
-                    <span class="tempo">#{m.tempo}</span>
-                </div>
-            </ui:repeat>
+            <section id="chat-info">
+                <span class="chat-title">CHAT GLOBAL - Websocket</span>
+                <span>Status: <span id="status-chat">Desconectado</span></span>
+            </section>
+            <h:panelGroup id="chat-mensagens">
+                <ui:repeat value="#{clientSession.chatMensagens}" var="m">
+                    <div class="mensagem #{clientSession.usuario.id != m.usuario.id ? 'notme': ''}">
+                        <span class="usuario">#{m.usuario.username}</span>
+                        <span class="conteudo">#{m.conteudo}</span>
+                        <span class="tempo">#{m.tempo}</span>
+                    </div>
+                </ui:repeat>
+            </h:panelGroup>
+            <h:form id="chat-form">
+                <h:inputText id="message-input" value="#{clientSession.conteudo}" required="true"/>
+                <h:commandButton id="send-button" value="Enviar" action="#{clientSession.send()}">
+                    <f:ajax execute="message-input" render="chat-form:message-input" />
+                </h:commandButton>
+            </h:form>
         </div>
-    </h:form>
+    </main>
 
     <script>
-        const chat = document.getElementById("chat");
+        const session_id = "#{clientSession.httpSession.id}"
+        const chat_status_el = document.getElementById('status-chat');
 
         function createSpan(className, content) {
             const span = document.createElement('span');
@@ -86,28 +218,50 @@
             return span;
         }
 
-        function createMessage(data) {
+        function addMessage(data) {
+            const chat = document.getElementById("chat-mensagens");
             const msg = document.createElement('div');
             const usuario = createSpan('usuario', data.usuario.username);
             const conteudo = createSpan('conteudo', data.conteudo);
             const tempo = createSpan('tempo', data.tempo);
-            msg.append(usuario, conteudo, tempo);
+
             msg.classList.add('mensagem')
+            if(session_id !== data.usuario.id) {
+                msg.classList.add('notme');
+            }
+
+            msg.append(usuario, conteudo, tempo);
             chat.append(msg)
+            chat.scrollTo(0, msg.offsetHeight * chat.childElementCount)
         }
 
-        function onmessageHandler(data) {
-            createMessage(data);
+        function onmessageHandler(data, channel, event) {
+            console.log(event)
+            addMessage(data);
         }
 
         function onopenHandler() {
-            document.getElementById('opened').innerHTML='online';
+            chat_status_el.className = 'status-connected'
+            chat_status_el.innerHTML = 'Conectado';
+        }
+
+        function oncloseHandler() {
+            chat_status_el.className = 'status-disconnected'
+            chat_status_el.innerHTML = 'Desconectado';
+        }
+
+        function onerrorHandler() {
+            chat_status_el.className = 'status-error'
+            chat_status_el.innerHTML = 'Erro';
         }
     </script>
 
-    <f:websocket channel="push"
+    <f:websocket channel="globalChannel"
                  onopen="onopenHandler"
                  onmessage="onmessageHandler"
+                 onclose="oncloseHandler"
+                 onerror="onerrorHandler"
+                 connected="#{clientSession.conectado}"
     />
 </h:body>
 </html>

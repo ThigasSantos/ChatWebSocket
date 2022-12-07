@@ -1,6 +1,9 @@
 package com.example.demo.ws;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.faces.push.Push;
+import jakarta.faces.push.PushContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.util.ArrayList;
@@ -10,6 +13,9 @@ import java.util.List;
 @ApplicationScoped
 public class ChatGlobal {
 
+    @Inject @Push(channel = "globalChannel")
+    private PushContext push;
+
     private List<Mensagem> mensagens;
 
     private List<Usuario> usuarios;
@@ -18,18 +24,19 @@ public class ChatGlobal {
 
 
     public Usuario addUsuario() {
-        usuariosCount++;
-        Usuario usuario = new Usuario("guest" + usuariosCount);
+        Usuario usuario = new Usuario("guest-" + ++usuariosCount);
         if(this.usuarios == null) this.usuarios = new ArrayList<>();
         usuarios.add(usuario);
         return usuario;
     }
 
-    public void addMensagem(Mensagem m) {
+    public void sendMensagem(Mensagem m) {
         if(this.mensagens == null) this.mensagens = new ArrayList<>();
         mensagens.add(m);
+        push.send(m);
     }
 
+    // <editor-fold  defaultstate="collapsed" desc="Getters/Setters" >
     public List<Mensagem> getMensagens() {
         return mensagens;
     }
@@ -45,4 +52,6 @@ public class ChatGlobal {
     public void setUsuarios(List<Usuario> usuarios) {
         this.usuarios = usuarios;
     }
+    // </editor-fold>
+
 }
