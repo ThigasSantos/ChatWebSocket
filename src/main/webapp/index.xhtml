@@ -179,17 +179,20 @@
             <h:inputText id="username-input" value="#{clientSession.usuario.username}" disabled="#{clientSession.conectado}"/>
             <h:commandButton
                     value="#{clientSession.conectado ? 'desconectar' : 'conectar'}"
-                    action="#{clientSession.conectar()}">
+                    action="#{clientSession.toggleConnection()}">
                 <f:ajax execute="username-input" render="form-conectar chat-mensagens" />
             </h:commandButton>
         </h:form>
 
         <div id="chat">
+
             <section id="chat-info">
                 <span class="chat-title">CHAT GLOBAL - Websocket</span>
                 <span>Status: <span id="status-chat">Desconectado</span></span>
             </section>
+
             <h:panelGroup id="chat-mensagens">
+
                 <ui:repeat value="#{clientSession.chatMensagens}" var="m">
                     <div class="mensagem #{clientSession.usuario.id != m.usuario.id ? 'notme': ''}">
                         <span class="usuario">#{m.usuario.username}</span>
@@ -197,13 +200,16 @@
                         <span class="tempo">#{m.tempo}</span>
                     </div>
                 </ui:repeat>
+
             </h:panelGroup>
+
             <h:form id="chat-form">
                 <h:inputText id="message-input" value="#{clientSession.conteudo}" required="true"/>
                 <h:commandButton id="send-button" value="Enviar" action="#{clientSession.send()}">
                     <f:ajax execute="message-input" render="chat-form:message-input" />
                 </h:commandButton>
             </h:form>
+
         </div>
     </main>
 

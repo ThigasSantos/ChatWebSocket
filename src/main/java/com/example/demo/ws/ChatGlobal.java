@@ -16,22 +16,20 @@ public class ChatGlobal {
     @Inject @Push(channel = "globalChannel")
     private PushContext push;
 
-    private List<Mensagem> mensagens;
+    private List<Mensagem> mensagens = new ArrayList<>();
 
-    private List<Usuario> usuarios;
+    private List<Usuario> usuarios = new ArrayList<>();
 
     private static int usuariosCount = 0;
 
 
     public Usuario addUsuario() {
         Usuario usuario = new Usuario("guest-" + ++usuariosCount);
-        if(this.usuarios == null) this.usuarios = new ArrayList<>();
         usuarios.add(usuario);
         return usuario;
     }
 
     public void sendMensagem(Mensagem m) {
-        if(this.mensagens == null) this.mensagens = new ArrayList<>();
         mensagens.add(m);
         push.send(m);
     }

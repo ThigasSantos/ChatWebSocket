@@ -16,11 +16,11 @@ public class WSController {
 
 
     public void onOpen(@Observes @WebsocketEvent.Opened WebsocketEvent event) {
-        log.log(Level.SEVERE,"ITS OOOOOOOOOOOOOOPEEEEEEEN" );
+        log.log(Level.SEVERE,"Conexão Aberta" );
         log.log(Level.SEVERE,"Canal:" + event.getChannel());
     }
     public void onClose(@Observes @Closed WebsocketEvent event) {
-        log.log(Level.SEVERE,"ITS CLOOOOOOOOSED" );
+        log.log(Level.SEVERE,"Conexão Fechada" );
         log.log(Level.SEVERE,"Canal: " + event.getChannel());
         log.log(Level.SEVERE, "Close Code: " + event.getCloseCode());
     }

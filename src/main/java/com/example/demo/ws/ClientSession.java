@@ -42,7 +42,7 @@ public class ClientSession implements Serializable {
         conteudo = "";
     }
 
-    public void conectar() {
+    public void toggleConnection() {
         conectado = !conectado;
     }
 
